@@ -1,0 +1,25 @@
+{
+    "name": "nemutagk/irongraph",
+    "description": "Cliente sencillo de GraphQL para laravel/lumen 8.0",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Jose Alberto Cabrera",
+            "email": "nemutagk@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^7.2.5",
+        "guzzlehttp/guzzle": "^7.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Nemutagk\\Irongraph\\": "src/"
+        },
+        "files": [
+            "src/Helper/Functions.php"
+        ]
+    },
+    "minimum-stability": "dev",
+    "require": {}
+}
