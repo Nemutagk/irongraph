@@ -8,7 +8,6 @@ use Nemutagk\Irongraph\Exception\ErrorIrongraphException;
 
 class Client
 {
-	private static $instance;
 	protected $baseURL;
 	protected $token;
 
@@ -17,10 +16,6 @@ class Client
 			$this->baseURL = $baseURL;
 
 		return $this;
-	}
-
-	public static function getInstance(string $baseURL) : Client {
-		return empty(self::$instance) ? self::$instance = new self($baseURL) : self::$instance;
 	}
 
 	public function setToken(string $token) : Client {
@@ -70,6 +65,8 @@ class Client
 				]
 			];
 
+			Log::info('Payload: '.print_r($payload, true));
+
 			$response = $client->post($this->baseURL, $payload);
 
 			$rawResponse = $response->getBody()->getContents();
@@ -82,10 +79,10 @@ class Client
 
 			return $finalResponse;
 		}catch(ClientException | RequestException | ServerException $e) {
-			// exception_error($e);
+			exception_error($e);
 			throw new ErrorIrongraphException($e->getMessage(), json_decode($e->getResponse()->getBody()->getContents(), true), $e->getResponse()->getStatusCode());
 		}catch(Exception $e) {
-			// exception_error($e);
+			exception_error($e);
 			throw new ErrorIrongraphException($e->getMessage());
 		}
 	}
