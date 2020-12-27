@@ -8,19 +8,15 @@ use Nemutagk\Irongraph\Exception\ErrorIrongraphException;
 
 class Client
 {
-	private static $instance;
 	protected $baseURL;
 	protected $token;
+	protected $debug = false;
 
 	public function __construct(string $baseURL='') {
 		if (!empty($baseURL))
 			$this->baseURL = $baseURL;
 
 		return $this;
-	}
-
-	public static function getInstance(string $baseURL) : Client {
-		return empty(self::$instance) ? self::$instance = new self($baseURL) : self::$instance;
 	}
 
 	public function setToken($token) : Client {
@@ -35,33 +31,45 @@ class Client
 		return $this;
 	}
 
+	public function setDebug(bool $debug) : Client {
+		$this->debug = $debug;
+
+		return $this;
+	}
+
 	protected function getParameters($parameters = [], $level=1) : string {
 		$query = '';
 
 		if (count($parameters) == 0)
 			$parameters = $this->parameters;
 
-		$tab = '';
-
-		for($i=0; $i<$level; $i++) {
-			$tab .= "\t";
-		}
-
 		foreach($parameters as $key => $param) {
 			if (!is_array($param))
-				$query .= $tab.$param."\n\t";
+				$query .= $param." ";
 			else
-				$query .= $tab.$key." {\n\t".$this->getParameters($param, ($level+1)).$tab."}\n\t";
+				$query .= " ".$key." {".$this->getParameters($param, ($level+1))."}";
 		}
+
+		if ($this->debug)
+			Log::info('Query: '.$query);
 
 		return $query;
 	}
 
 	public function query(string $query, array $parameters=[], array $config=[]) {
-		$operationName = substr($query, 7, (strpos($query, '{') - 8));
+		$operationName = substr($query, 6, (strpos($query, '{') - 7));
+
+		if ($this->debug) Log::info('OperationName: '.$operationName);
 
 		try {
-			$client = new HttpClient($this->parseConfig($config));
+			if (method_exists($this, 'beforeInterceptor'))
+				$config = $this->beforeInterceptor($config);
+
+			$config = $this->parseConfig($config);
+
+			if ($this->debug) Log::info('Config: ', $config ?? []);
+
+			$client = new HttpClient($config);
 
 			$payload = [
 				'json' => [
@@ -71,11 +79,18 @@ class Client
 				]
 			];
 
-			Log::info('GrapQL Params: ', $payload);
+			if ($this->debug) Log::info('GraphQL Payload: ', $payload);
 
-			$response = $client->post($this->baseURL, $payload);
+			$rawResponse = $client->post($this->baseURL, $payload);
 
-			return json_decode($response->getBody()->getContents(), true);
+			$response = json_decode($rawResponse->getBody()->getContents(), true);
+
+			if (method_exists($this, 'afterInterceptor'))
+				$response = $this->afterInterceptor($response);
+
+			if ($this->debug) Log::info('Response: ', $response);
+
+			return $response;
 		}catch(ClientException | RequestException | ServerException $e) {
 			// exception_error($e);
 			throw new ErrorIrongraphException($e->getMessage(), json_decode($e->getResponse()->getBody()->getContents(), true), $e->getResponse()->getStatusCode());
@@ -86,11 +101,11 @@ class Client
 	}
 
 	protected function parseConfig(array $config) : array {
-		if (!isset($config['header']))
-			$config['header'] = [];
+		if (!isset($config['headers']))
+			$config['headers'] = [];
 
 		if (!empty($this->token))
-			$config['header']['Authorization'] = 'Bearer '.$this->token;
+			$config['headers']['authorization'] = 'Bearer '.$this->token;
 
 		return $config;
 	}
