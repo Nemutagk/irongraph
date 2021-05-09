@@ -57,7 +57,12 @@ class Client
 	}
 
 	public function query(string $query, array $parameters=[], array $config=[]) {
-		$operationName = substr($query, 6, (strpos($query, '{') - 7));
+		$query = preg_replace("/\s+/", " ", $query);
+
+		if (strpos($query, 'query') !== false)
+			$operationName = substr($query, 6, (strpos($query, '{') - 7));
+		else
+			$operationName = substr($query, 9, (strpos($query, '{') - 10));
 
 		if ($this->debug) Log::info('OperationName: '.$operationName);
 
@@ -82,14 +87,17 @@ class Client
 			if ($this->debug) Log::info('GraphQL Payload: ', $payload);
 
 			$rawResponse = $client->post($this->baseURL, $payload);
-
-			$response = json_decode($rawResponse->getBody()->getContents(), true);
+			$rawBody = $rawResponse->getBody()->getContents();
+			$response = json_decode($rawBody, true);
 
 			if (method_exists($this, 'afterInterceptor'))
 				$response = $this->afterInterceptor($response);
 
-			if ($this->debug) Log::info('Response: ', $response);
+			if ($this->debug) Log::info('Response: '.print_r($response, true));
 
+			if (isset($response['errors']))
+				throw new ErrorIrongraphException($response['errors'][0]['message'], $response, 500);
+			
 			return $response;
 		}catch(ClientException | RequestException | ServerException $e) {
 			// exception_error($e);
