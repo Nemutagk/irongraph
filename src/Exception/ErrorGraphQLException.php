@@ -1,9 +1,9 @@
 <?php
-namespace Nemutagk\Irongraph\Exception;
+namespace BienParaBien\GraphqlClient\Exception;
 
 use Exception;
 
-class ErrorIrongraphException extends Exception
+class ErrorGraphQLException extends Exception
 {
 	protected $error;
 
