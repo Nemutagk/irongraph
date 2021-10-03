@@ -4,6 +4,7 @@ namespace Nemutagk\Irongraph;
 use Log;
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Exception\{ClientException,RequestException,ServerException};
+use Nemutagk\Irongraph\Exception\ErrorIrongraphException;
 
 class Client
 {
