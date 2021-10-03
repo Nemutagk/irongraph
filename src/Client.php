@@ -11,9 +11,11 @@ class Client
 	protected $token;
 	protected $debug = false;
 
-	public function __construct(string $baseURL='') {
+	public function __construct(string $baseURL='', bool $debug=true) {
 		if (!empty($baseURL))
 			$this->baseURL = $baseURL;
+
+		$this->debug = $debug;
 
 		return $this;
 	}
