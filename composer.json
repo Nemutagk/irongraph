@@ -14,7 +14,7 @@
     },
     "autoload": {
         "psr-4": {
-            "BienParaBien\\GraphqlClient\\": "src/"
+            "Nemutagk\\Irongraph\\": "src/"
         },
         "files": [
             "src/Helper/Functions.php"
