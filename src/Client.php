@@ -4,7 +4,6 @@ namespace BienParaBien\GraphqlClient;
 use Log;
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Exception\{ClientException,RequestException,ServerException};
-use BienParaBien\GraphqlClient\Exception\ErrorGraphQLException;
 
 class Client
 {
