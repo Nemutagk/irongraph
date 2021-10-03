@@ -1,5 +1,5 @@
 <?php
-namespace BienParaBien\GraphqlClient;
+namespace Nemutagk\Irongraph;
 
 use Log;
 use GuzzleHttp\Client as HttpClient;

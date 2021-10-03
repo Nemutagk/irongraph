@@ -1,5 +1,5 @@
 <?php
-namespace BienParaBien\GraphqlClient\Exception;
+namespace Nemutagk\Irongraph\Exception;
 
 use Exception;
 
