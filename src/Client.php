@@ -102,10 +102,8 @@ class Client
 			
 			return $response;
 		}catch(ClientException | RequestException | ServerException $e) {
-			// exception_error($e);
-			throw new ErrorIrongraphException($e->getMessage(), json_decode($e->getResponse()->getBody()->getContents(), true), $e->getResponse()->getStatusCode());
+			throw new ErrorIrongraphException('El cliente a dichi: '.$e->getMessage(), json_decode($e->getResponse()->getBody()->getContents(), true), $e->getResponse()->getStatusCode());
 		}catch(Exception $e) {
-			// exception_error($e);
 			throw new ErrorIrongraphException($e->getMessage());
 		}
 	}

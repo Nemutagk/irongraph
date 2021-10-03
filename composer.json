@@ -1,11 +1,11 @@
 {
-    "name": "bienparabien/graphql-client",
+    "name": "nemutagk/irongraph",
     "description": "Cliente sencillo de GraphQL para laravel/lumen 8.0",
     "license": "MIT",
     "authors": [
         {
             "name": "Jose Cabrera",
-            "email": "jcabrera@bienparabien.com"
+            "email": "nemutagk@gmail.com"
         }
     ],
     "require": {
@@ -15,10 +15,7 @@
     "autoload": {
         "psr-4": {
             "Nemutagk\\Irongraph\\": "src/"
-        },
-        "files": [
-            "src/Helper/Functions.php"
-        ]
+        }
     },
     "minimum-stability": "dev",
     "require": {}
