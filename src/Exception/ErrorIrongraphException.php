@@ -6,20 +6,20 @@ use Exception;
 class ErrorIrongraphException extends Exception
 {
 	protected $response;
-	protected $httpCode;
+	protected $payload;
 
-	public function __construct($message, $response=null, $httpCode=0, Exception $previus=null) {
+	public function __construct($message, $response=null, $payload=null, $code=0, Exception $previus=null) {
 		$this->response = $response;
-		$this->httpCode = $httpCode;
+		$this->payload = $payload;
 
-		parent::__construct($message, $httpCode, $previus);
+		parent::__construct($message, $code, $previus);
+	}
+
+	public function getPayload() {
+		return $this->payload;
 	}
 
 	public function getResponse() {
 		return $this->response;
-	}
-
-	public function getHttpCode() {
-		return $this->httpCode;
 	}
 }

@@ -39,6 +39,12 @@ class Client
 		return $this;
 	}
 
+	public function setTesting(bool $testing) : Client {
+		$this->testing = $testing;
+
+		return $this;
+	}
+
 	protected function getParameters($parameters = [], $level=1) : string {
 		$query = '';
 
@@ -76,6 +82,23 @@ class Client
 
 			if ($this->debug) Log::info('Config: ', $config ?? []);
 
+			$testing = !property_exists($this, 'testing') ? env('IRONGRAPH_TESTING', false) : $this->testing;
+
+			if (env('APP_ENV') == 'testing')
+				$testing = true;
+
+			if ($testing && method_exists($this, 'mockup')) {
+				$response = $this->mockup($config);
+
+				if (method_exists($this,'afterInterceptor'))
+					$response = $this->afterInterceptor($response);
+
+				if (isset($response['errors']))
+					throw new ErrorIrongraphException($response['errors'][0]['message'], $response, 500);
+
+				return $response;
+			}
+
 			$client = new HttpClient($config);
 
 			$payload = [
@@ -98,11 +121,13 @@ class Client
 			if ($this->debug) Log::info('Response: '.print_r($response, true));
 
 			if (isset($response['errors']))
-				throw new ErrorIrongraphException($response['errors'][0]['message'], $response, 500);
+				throw new ErrorIrongraphException($response['errors'][0]['message'], $response, $payload, 500);
 			
 			return $response;
 		}catch(ClientException | RequestException | ServerException $e) {
-			throw new ErrorIrongraphException('El cliente a dichi: '.$e->getMessage(), json_decode($e->getResponse()->getBody()->getContents(), true), $e->getResponse()->getStatusCode());
+			// exception_error($e);
+			$exception_payload = isset($payload) ? $payload : null;
+			throw new ErrorIrongraphException($e->getMessage(), json_decode($e->getResponse()->getBody()->getContents(), true), $exception_payload, $e->getResponse()->getStatusCode());
 		}catch(Exception $e) {
 			throw new ErrorIrongraphException($e->getMessage());
 		}
