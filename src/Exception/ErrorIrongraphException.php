@@ -5,15 +5,21 @@ use Exception;
 
 class ErrorIrongraphException extends Exception
 {
-	protected $error;
+	protected $response;
+	protected $payload;
 
-	public function __construct($message, $error=null, $code=0, Exception $previus=null) {
-		$this->error = $error;
+	public function __construct($message, $response=null, $payload=null, $code=0, Exception $previus=null) {
+		$this->response = $response;
+		$this->payload = $payload;
 
 		parent::__construct($message, $code, $previus);
 	}
 
-	public function getError() {
-		return $this->error;
+	public function getPayload() {
+		return $this->payload;
+	}
+
+	public function getResponse() {
+		return $this->response;
 	}
 }
